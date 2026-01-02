@@ -1,11 +1,15 @@
-FROM node:16-slim
-# RUN apt-get update && apt-get install -y curl iputils-ping && rm -rf /var/lib/apt/lists/*
+# Stage 1: Build
+FROM node:16-slim as build
 WORKDIR /app
-COPY package.json ./ 
-RUN npm cache clean --force
-RUN npm install 
-COPY . . 
-EXPOSE 4000
-CMD ["npm", "run", "dev"]
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
 
-
+# Stage 2: Serve
+FROM node:16-slim
+WORKDIR /app
+RUN npm install -g serve
+COPY --from=build /app/build ./build
+EXPOSE 8080
+CMD ["serve", "-s", "build", "-l", "8080"]
