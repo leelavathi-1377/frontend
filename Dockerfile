@@ -1,8 +1,8 @@
 # Stage 1: Build
-FROM node:16-slim AS build
+FROM node:18-bullseye-slim AS build
 WORKDIR /app
 
-# Install build tools for Rollup/Vite
+# Install build tools for Vite/Rollup
 RUN apt-get update && apt-get install -y build-essential python3 && rm -rf /var/lib/apt/lists/*
 
 # Copy package files and install dependencies
@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve
-FROM node:16-slim
+FROM node:18-bullseye-slim
 WORKDIR /app
 
 # Install 'serve' to serve static files
@@ -25,7 +25,7 @@ RUN npm install -g serve
 # Copy built files from previous stage
 COPY --from=build /app/build ./build
 
-# Use Cloud Run port
+# Cloud Run will provide PORT
 ENV PORT $PORT
 EXPOSE $PORT
 
