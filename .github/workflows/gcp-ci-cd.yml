@@ -45,4 +45,4 @@ jobs:
             --platform managed \
             --region $REGION \
             --allow-unauthenticated \
-            --port 3000
+            --port 8080
