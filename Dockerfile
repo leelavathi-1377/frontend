@@ -1,11 +1,13 @@
+# Build stage
 FROM node:18-bullseye-slim AS build
-# RUN apt-get update && apt-get install -y curl iputils-ping && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY package.json ./ 
-RUN npm cache clean --force
-RUN npm install 
-COPY . . 
+COPY package.json package-lock.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Runtime stage
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 8080
-CMD ["npm", "run", "dev"]
-
-
+CMD ["nginx", "-g", "daemon off;"]
